@@ -9,7 +9,7 @@ import * as path from 'path';
 
 // Debug Network Exports
 const NetworkLib = require('@stacks/network');
-const STACKS_TESTNET = NetworkLib.STACKS_MOCKNET; // Use MOCKNET for local devnet addresses
+const STACKS_TESTNET = NetworkLib.STACKS_TESTNET; 
 
 dotenv.config({ path: '.env' });
 
