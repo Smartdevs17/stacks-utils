@@ -4,11 +4,14 @@ import {
   broadcastTransaction, 
   stringAsciiCV,
 } from '@stacks/transactions';
-import { STACKS_TESTNET } from '@stacks/network';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-dotenv.config({ path: '../.env' });
+// Debug Network Exports
+const NetworkLib = require('@stacks/network');
+const STACKS_TESTNET = NetworkLib.STACKS_MOCKNET; // Use MOCKNET for local devnet addresses
+
+dotenv.config({ path: '.env' });
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -19,13 +22,13 @@ async function runSwarm() {
     return;
   }
   
-  // This should match the deployed address from deploy-gen.ts
-  // For this atomic run, we'll hardcode or grab from config if we had a shared one for scripts.
-  // Using the deployer address as default.
-  const contractAddress = 'ST1PQ24CH0EKEDT2R3S6A7D9D99N6B0X7FR05624W';
+  // Hardcoded standard devnet address - assuming this key matches ST1PQ...
+  // If checksum fails, ensure this address IS correct for the key 753b...
+  const contractAddress = 'ST1PQ24CH0EKEDT2R3S6A7D9D99N6B0X7FR05624W'; 
   const contractName = 'transaction-gen-v1';
 
-  console.log("🐜 swarm-v1: Starting Micro-Transaction Generator...");
+  console.log(`🐜 swarm-v1: Starting Micro-Transaction Generator...`);
+  console.log(`Target: ${contractAddress}.${contractName}`);
 
   const ITERATIONS = 50; 
   
@@ -41,21 +44,24 @@ async function runSwarm() {
             functionArgs,
             senderKey: privateKey,
             network: STACKS_TESTNET,
-            anchorBlockOnly: false, // False for faster mempool acceptance on testnet
-            fee: 1000, // Min fee
+            anchorBlockOnly: false, 
+            fee: 1000,
         };
 
         const transaction = await makeContractCall(txOptions);
         const result = await broadcastTransaction({ transaction, network: STACKS_TESTNET });
         
         console.log(`[Swarm] TX #${i+1} (${functionName}) Broadcast: ${result.txid}`);
+        // If result.error exists, log it
+        if ((result as any).error) {
+             console.error(`[Swarm] Broadcast Error:`, (result as any).error);
+        }
         
-        // Wait a bit to avoid sequence errors if mempool is slow
         await sleep(2000); 
 
-    } catch (e) {
-        console.error(`[Swarm] TX #${i+1} Failed:`, e);
-        await sleep(5000);
+    } catch (e: any) {
+        console.error(`[Swarm] TX #${i+1} Failed:`, e.message);
+        // If checksum error, it means contractAddress is bad string.
     }
   }
   console.log("🐜 swarm-v1: Batch Complete.");
