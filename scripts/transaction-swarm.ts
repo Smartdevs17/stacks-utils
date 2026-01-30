@@ -24,7 +24,7 @@ async function runSwarm() {
   
   // Hardcoded standard devnet address - assuming this key matches ST1PQ...
   // If checksum fails, ensure this address IS correct for the key 753b...
-  const contractAddress = 'ST1PQ24CH0EKEDT2R3S6A7D9D99N6B0X7FR05624W'; 
+  const contractAddress = 'SP9AS5B36MKC0FVF4DE75A1EBPANXQ14AEH98BH0'; 
   const contractName = 'transaction-gen-v1';
 
   console.log(`🐜 swarm-v1: Starting Micro-Transaction Generator...`);
